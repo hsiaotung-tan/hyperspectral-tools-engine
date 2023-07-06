@@ -12,7 +12,7 @@ class HSDT(pl.LightningModule):
         self.example_input_array=torch.Tensor(1, 1, 31, 64, 64)
         self.save_hyperparameters()
 
-        # self.automatic_optimization = False
+        self.automatic_optimization = False
 
         self.net = arch.HSDT(in_channels=in_channels, channels=channels, num_half_layer=num_half_layer, sample_idx=sample_idx, Fusion=Fusion)
         self.net.use_2dconv = False
@@ -26,18 +26,18 @@ class HSDT(pl.LightningModule):
 
         
         # it is independent of forward
-        # opt = self.optimizers()
-        # opt.zero_grad()
+        opt = self.optimizers()
+        opt.zero_grad()
         x, y = batch
         length = len(x)
         y_hat = self.net(x)
-
         loss = nn.functional.mse_loss(y_hat, y)
-        # self.manual_backward(loss)
-        # opt.step()
+        self.manual_backward(loss)
+        opt.step()
 
         # Logging to TensorBoard (if installed) by default
         # log默认是一次记录一个batch的
+        
         psnr_v = 0
         ssim_v = 0
         sam_v = 0
@@ -49,6 +49,7 @@ class HSDT(pl.LightningModule):
         psnr_v/=length
         ssim_v/=length
         sam_v/=length
+        
         self.log_dict({"train_loss":loss, 'train_psnr':psnr_v, 'train_ssim': ssim_v, 'train_sam': sam_v})
         return loss
     
@@ -117,3 +118,9 @@ class HSDT(pl.LightningModule):
             #     'name' : 'learning rate variety'
             # }
         }
+    
+
+if __name__ == '__main__':
+    x = torch.randn((1,1, 64, 64))
+    model = HSDT(in_channels=1, channels=16, num_half_layer=5, sample_idx=[1, 3])
+    print(model(x).shape)

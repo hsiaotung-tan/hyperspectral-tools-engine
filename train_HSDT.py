@@ -3,7 +3,7 @@ from torch import nn, optim, utils
 from typing import Any
 import torch
 
-
+import os
 import lightning.pytorch as pl
 from lightning.pytorch import seed_everything
 from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor
@@ -19,10 +19,10 @@ model = HSDT(in_channels=1, channels=16, num_half_layer=5, sample_idx=[1, 3])
 
 
 
-loader1 = get_gaussian_icvl_loader_s1()
-loader2 = get_gaussian_icvl_loader_s2()
-val_loader = get_gaussian_icvl_loader_val()
-test_loader = get_gaussian_icvl_loader_test()
+loader1 = get_gaussian_icvl_loader_s1(num_workers=0, pin_memory=True)
+loader2 = get_gaussian_icvl_loader_s2(num_workers=0, pin_memory=True)
+val_loader = get_gaussian_icvl_loader_val(num_workers=0)
+test_loader = get_gaussian_icvl_loader_test(num_workers=0)
 
 class SwitchDatasetCallback(pl.Callback):
     def on_epoch_end(self, trainer, pl_module):
@@ -42,6 +42,6 @@ checkpoint_callback = ModelCheckpoint(
 lr_monitor = LearningRateMonitor(logging_interval='epoch')
 
 # accumulate_grad_batches=4
-trainer = pl.Trainer(max_epochs=80, devices=1, log_every_n_steps=1, callbacks=[checkpoint_callback,lr_monitor,switchDatasetCallback], )
-trainer.fit(model, train_dataloaders=loader1, val_dataloaders=val_loader)
+trainer = pl.Trainer(max_epochs=80, devices=1, log_every_n_steps=1, callbacks=[checkpoint_callback,lr_monitor,switchDatasetCallback], default_root_dir=os.getcwd()+'/'+'logs/HSDT')
+trainer.fit(model, train_dataloaders=loader1, val_dataloaders=val_loader, )
 trainer.test(model, test_loader=test_loader, ckpt_path='best')

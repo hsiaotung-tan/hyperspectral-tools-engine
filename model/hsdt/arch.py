@@ -4,8 +4,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from attention import TransformerBlock
-from sepconv import SepConv_DP, SepConv_DP_CA, S3Conv
+from .attention import TransformerBlock
+from .sepconv import SepConv_DP, SepConv_DP_CA, S3Conv
 
 BatchNorm3d = nn.BatchNorm3d
 Conv3d = S3Conv.of(nn.Conv3d)
@@ -116,7 +116,6 @@ class HSDT(nn.Module):
 
     def forward(self, x):
         xs = [x]
-        print(xs[0].shape)
         out = self.head(xs[0])
         xs.append(out)
         out = self.encoder(out, xs)
