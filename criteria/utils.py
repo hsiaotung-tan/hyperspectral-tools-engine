@@ -41,15 +41,13 @@ def ssim(
     img1: torch.Tensor, img2: torch.Tensor, win_size=7
 ) -> torch.Tensor:
     """
-    Compute the peak signal-to-noise ratio between two images
+    Compute the mean structural similarity index between two images
 
     Parameters
     ----------
     img1 : torch.Tensor
     img2 : torch.Tensor
-    bandwise: bool
-        If true, do the calculation for each band
-        default: False (calculation done for the full image)
+    win_size: windows size
 
     Returns
     -------
@@ -62,7 +60,9 @@ def ssim(
     return torch.mean(km.ssim(img1, img2, window_size=win_size, max_val=max(img1.max(), img2.max()).item()), dtype=torch.float32)
 
 
-def sam(noise: torch.Tensor, reference: torch.Tensor) -> torch.Tensor:
+def sam(
+        noise: torch.Tensor, reference: torch.Tensor
+) -> torch.Tensor:
     """
     Measure spectral similarity using spectral angle mapper. Result is in radians.
 
