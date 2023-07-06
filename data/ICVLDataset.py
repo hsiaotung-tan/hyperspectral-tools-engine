@@ -6,6 +6,15 @@ import numpy as np
 from torchvision import transforms
 from transforms import utils, noises
 
+__all__ = [
+    'ICVLDataset',
+    'get_gaussian_icvl_loader_s1',
+    'get_gaussian_icvl_loader_s2',
+    'get_gaussian_icvl_loader_val',
+    'get_gaussian_icvl_loader_test',
+
+]
+
 def worker_init_fn(worker_id):
     np.random.seed(np.random.get_state()[1][0] + worker_id)
 
