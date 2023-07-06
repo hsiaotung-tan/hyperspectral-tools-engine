@@ -91,8 +91,6 @@ class AddGaussanBlindNoiseContinuousStd(object):
 
 
 
-
-
 class AddNoiseNoniid(object):
     """add non-iid gaussian noise to the given torch.Tensor (B,H,W)"""
 
