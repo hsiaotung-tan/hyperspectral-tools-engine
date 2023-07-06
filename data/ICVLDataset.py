@@ -58,13 +58,12 @@ class ICVLDataset(Dataset):
 
     def __getitem__(self, idx):
         
-        img = utils.minmax_normalize(torch.tensor(np.load(self.files[idx]), dtype=torch.float32))
+        # crop HSI to designated size
+        img = self.base_transforms(torch.tensor(np.load(self.files[idx]), dtype=torch.float32))
+        
+        img = utils.minmax_normalize(img)
         if not self.use2d:
             img = img.unsqueeze(0)
-        
-
-        # crop HSI to designated size
-        img = self.base_transforms(img)
         
         # transforms of input and target 
         if self.common_transforms is not None:
@@ -91,5 +90,6 @@ if __name__ == '__main__':
     data_dir = '/HDD/Datasets/HSI_denoising/ICVL_HyDe/test'
     input_transform = noises.AddGaussanNoiseStd(70)
     sets = ICVLDataset(datadir=data_dir,input_transform=input_transform, use2d=False)
-    # print(sets[1][0].min())
-    print(sets[1][0]- sets[1][1])
+    # print(len(sets))
+    print(sets[1][0])
+    # print(sets[1][0]- sets[1][1])
