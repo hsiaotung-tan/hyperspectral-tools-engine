@@ -2,16 +2,14 @@ from torch import nn, optim
 import torch
 import lightning.pytorch as pl
 from .hsdt import arch
-
-from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from warmup_scheduler import GradualWarmupScheduler
 from torch.optim.lr_scheduler import MultiStepLR
-from criteria.utils import peak_snr,sam
+from criteria.utils import peak_snr,sam,ssim
 
 class HSDT(pl.LightningModule):
     def __init__(self, in_channels:int, channels:int, num_half_layer:int, sample_idx:list, Fusion=None):
         super().__init__()
-        self.example_input_array=torch.Tensor(1, 1, 31, 128, 128)
+        self.example_input_array=torch.Tensor(1, 1, 31, 64, 64)
         self.save_hyperparameters()
 
         # self.automatic_optimization = False
@@ -40,20 +38,18 @@ class HSDT(pl.LightningModule):
 
         # Logging to TensorBoard (if installed) by default
         # log默认是一次记录一个batch的
-        psnr = 0
-        ssim = 0
+        psnr_v = 0
+        ssim_v = 0
         sam_v = 0
-        for y,y_hat in zip(y.detach().cpu().numpy(), y_hat.detach().cpu().numpy()):
+        for y,y_hat in zip(y.detach(), y_hat.detach()):
             y, y_hat = y.squeeze(0), y_hat.squeeze(0)
-            psnr += peak_signal_noise_ratio(y, y_hat, data_range=1)
-            ssim += structural_similarity(y, y_hat, data_range=1, channel_axis=-3)
-            sam_v += sam(torch.tensor(y_hat), torch.tensor(y)).mean()
-        psnr/=length
-        ssim/=length
+            psnr_v += peak_snr(y, y_hat)
+            ssim_v += ssim(y, y_hat)
+            sam_v += sam(y_hat, y)
+        psnr_v/=length
+        ssim_v/=length
         sam_v/=length
-        # psnr = peak_signal_noise_ratio(y.detach().cpu().permute(0,1,4,2,3).numpy(), y_hat.detach().cpu().permute(0,1,4,2,3).numpy(), data_range=1)
-        # ssim = structural_similarity(y.detach().cpu().squeeze(1).numpy(), y_hat.detach().cpu().squeeze(1).numpy(),channel_axis=-3, data_range=1)
-        self.log_dict({"train_loss":loss, 'train_psnr':psnr, 'train_ssim': ssim, 'train_sam': sam_v})
+        self.log_dict({"train_loss":loss, 'train_psnr':psnr_v, 'train_ssim': ssim_v, 'train_sam': sam_v})
         return loss
     
     def validation_step(self, batch, batch_idx):
@@ -63,20 +59,18 @@ class HSDT(pl.LightningModule):
         y_hat = self.net(x)
         val_loss = nn.functional.mse_loss(y_hat, y)
         # log默认是一次记录一个batch的，但在test_step和validation_step会自动的给你accumulates并且average
-        psnr = 0
-        ssim = 0
+        psnr_v = 0
+        ssim_v = 0
         sam_v = 0
-        for y,y_hat in zip(y.detach().cpu().numpy(), y_hat.detach().cpu().numpy()):
+        for y,y_hat in zip(y.detach(), y_hat.detach()):
             y, y_hat = y.squeeze(0), y_hat.squeeze(0)
-            psnr += peak_signal_noise_ratio(y, y_hat,data_range=1)
-            ssim += structural_similarity(y, y_hat, data_range=1, channel_axis=-3)
-            sam_v += sam(torch.tensor(y_hat), torch.tensor(y)).mean()
-        psnr/=length
-        ssim/=length
+            psnr_v += peak_snr(y, y_hat)
+            ssim_v += ssim(y, y_hat)
+            sam_v += sam(y_hat, y)
+        psnr_v/=length
+        ssim_v/=length
         sam_v/=length
-        # psnr = peak_signal_noise_ratio(y.detach().cpu().permute(0,1,4,2,3).numpy(), y_hat.detach().cpu().permute(0,1,4,2,3).numpy(), data_range=1)
-        # ssim = structural_similarity(y.detach().cpu().squeeze(1).numpy(), y_hat.detach().cpu().squeeze(1).numpy(),channel_axis=-3, data_range=1)
-        self.log_dict({"val_loss":val_loss, 'val_psnr':psnr, 'val_ssim': ssim, 'val_sam': sam_v})
+        self.log_dict({'val_loss':val_loss, 'val_psnr':psnr_v, 'val_ssim': ssim_v, 'val_sam': sam_v})
         # self.log_dict({"train_loss":loss, 'train_psnr':psnr, 'train_ssim': ssim, 'train_sam': sam_v})
     
     def test_step(self, batch, batch_idx):
@@ -86,20 +80,18 @@ class HSDT(pl.LightningModule):
         y_hat = self.net(x)
         test_loss = nn.functional.mse_loss(y_hat, y)
         # log默认是一次记录一个batch的，但在test_step和validation_step会自动的给你accumulates并且average
-        psnr = 0
-        ssim = 0
+        psnr_v = 0
+        ssim_v = 0
         sam_v = 0
-        for y,y_hat in zip(y.detach().cpu().numpy(), y_hat.detach().cpu().numpy()):
+        for y,y_hat in zip(y.detach(), y_hat.detach()):
             y, y_hat = y.squeeze(0), y_hat.squeeze(0)
-            psnr += peak_signal_noise_ratio(y, y_hat,data_range=1)
-            ssim += structural_similarity(y, y_hat, data_range=1, channel_axis=-3)
-            sam_v += sam(torch.tensor(y_hat), torch.tensor(y)).mean()
-        psnr/=length
-        ssim/=length
+            psnr_v += peak_snr(y, y_hat)
+            ssim_v += ssim(y, y_hat)
+            sam_v += sam(y_hat, y)
+        psnr_v/=length
+        ssim_v/=length
         sam_v/=length
-        # psnr = peak_signal_noise_ratio(y.detach().cpu().permute(0,1,4,2,3).numpy(), y_hat.detach().cpu().permute(0,1,4,2,3).numpy(), data_range=1)
-        # ssim = structural_similarity(y.detach().cpu().squeeze(1).numpy(), y_hat.detach().cpu().squeeze(1).numpy(),channel_axis=-3, data_range=1)
-        self.log_dict({"test_loss":test_loss, 'test_psnr':psnr, 'test_ssim': ssim, 'test_sam': sam_v})
+        self.log_dict({'test_loss':test_loss, 'test_psnr':psnr_v, 'test_ssim': ssim_v, 'test_sam': sam_v})
     
 
     def backward(self, loss):
