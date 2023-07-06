@@ -1,6 +1,17 @@
 import torch
 import threading
 
+__all__ = [
+    '_AddGaussanNoiseStd',
+    '_AddGaussanBlindNoiseStd',
+    '_AddGaussanBlindNoiseContinuousStd',
+    '_AddNoiseNoniid'
+    'AddGaussanNoiseStd',
+    'AddGaussanBlindNoiseStd',
+    'AddGaussanBlindNoiseContinuousStd',
+    'AddNoiseNoniid',
+]
+
 class LockedIterator(object):
     def __init__(self, it):
         self.lock = threading.Lock()
@@ -53,7 +64,6 @@ class _AddGaussanBlindNoiseContinuousStd(object):
         img += noise
         return img
     
-
 class AddGaussanNoiseStd(object):
     """add gaussian noise to the given torch tensor (B,H,W)"""
     def __init__(self, sigma):
@@ -88,8 +98,6 @@ class AddGaussanBlindNoiseContinuousStd(object):
     def __call__(self, img):
         noise = torch.randn_like(img) * (self.max_sigma - self.min_sigma) * torch.rand(1) + self.min_sigma 
         return img + noise
-
-
 
 class AddNoiseNoniid(object):
     """add non-iid gaussian noise to the given torch.Tensor (B,H,W)"""

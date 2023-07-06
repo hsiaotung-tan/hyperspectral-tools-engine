@@ -1,6 +1,12 @@
 import numpy as np
 import torch
 
+__all__ = [
+    'minmax_normalize',
+    'clip_outliers',
+]
+
+
 def minmax_normalize(image: torch.Tensor):
     """Normalization single image by min and max
     Args:
