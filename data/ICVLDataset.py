@@ -89,7 +89,7 @@ class ICVLDataset(Dataset):
 
 if __name__ == '__main__':
     data_dir = '/HDD/Datasets/HSI_denoising/ICVL_HyDe/test'
-    input_transform = noises.AddGaussanNoiseStd(30)
+    input_transform = noises.AddGaussanNoiseStd(70)
     sets = ICVLDataset(datadir=data_dir,input_transform=input_transform, use2d=False)
     # print(sets[1][0].min())
-    print(sets[1][0])
+    print(sets[1][0]- sets[1][1])

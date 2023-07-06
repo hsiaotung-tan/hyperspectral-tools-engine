@@ -40,8 +40,21 @@ class AddGaussanBlindNoiseStd(object):
         noise = torch.randn_like(img) * self.sigmas_ratio[next(self.pos)]
         img += noise
         return img
-    
+
+class AddGaussanBlindNoiseContinuousStd(object):
+    """add blind gaussian noise to the given numpy array (B,H,W)"""
+
+    def __init__(self, min_sigma, max_sigma):
+        self.min_sigma = min_sigma / 255
+        self.max_sigma = max_sigma / 255
+
+    def __call__(self, img):
+        noise = torch.randn_like(img) * (self.max_sigma - self.min_sigma) * torch.rand(1) + self.min_sigma 
+        img += noise
+        return img
+
+ 
 if __name__ == '__main__':
-    t = AddGaussanBlindNoiseStd(sigmas=[15, 30, 50, 70])
+    t = AddGaussanBlindNoiseContinuousStd(10,30)
     img = torch.randn((1, 3, 31, 31))
     print(t(img).shape)
