@@ -107,6 +107,13 @@ def get_gaussian_icvl_loader_val(use_conv2d=False, crop_size=(512, 512), batch_s
     loader = DataLoader(dataset=dataset, batch_size=1, shuffle=shuffle, num_workers=num_workers, pin_memory=pin_memory, worker_init_fn=worker_init_fn)
     return loader
 
+def get_gaussian_icvl_loader_test(use_conv2d=False, crop_size=(512, 512), batch_size=1, shuffle=True, num_workers=8, pin_memory=False):
+    data_dir = '/HDD/Datasets/HSI_denoising/ICVL/Origin/test'
+    input_transform = noises.AddGaussanNoiseStd(50)
+    dataset = ICVLDataset(datadir=data_dir, crop_size=crop_size, input_transform=input_transform, use2d=use_conv2d)
+    loader = DataLoader(dataset=dataset, batch_size=1, shuffle=shuffle, num_workers=num_workers, pin_memory=pin_memory, worker_init_fn=worker_init_fn)
+    return loader
+
 
 if __name__ == '__main__':
     data_dir = '/HDD/Datasets/HSI_denoising/ICVL_HyDe/test'
