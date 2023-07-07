@@ -33,15 +33,16 @@ class SwitchDatasetCallback(pl.Callback):
 switchDatasetCallback = SwitchDatasetCallback()
 
 # saves top-K checkpoints based on "val_psnr" metric
-checkpoint_callback = ModelCheckpoint(
-    save_top_k=2,
-    monitor="val_psnr",
-    mode="max",
-    filename="hsdt-{epoch:02d}-{val_psnr:.2f}",
-)
+# checkpoint_callback = ModelCheckpoint(
+#     save_top_k=2,
+#     monitor="val_psnr",
+#     mode="max",
+#     filename="hsdt-{epoch:02d}-{val_psnr:.2f}",
+# )
 lr_monitor = LearningRateMonitor(logging_interval='epoch')
 
 # accumulate_grad_batches=4
-trainer = pl.Trainer(max_epochs=80, devices=1, log_every_n_steps=1, callbacks=[checkpoint_callback,lr_monitor,switchDatasetCallback], default_root_dir=os.getcwd()+'/'+'logs/HSDT')
+trainer = pl.Trainer(max_epochs=80, devices=1, log_every_n_steps=1, callbacks=[lr_monitor,switchDatasetCallback], default_root_dir=os.getcwd()+'/'+'logs/HSDT')
+# trainer = pl.Trainer(max_epochs=80, devices=1, log_every_n_steps=1, callbacks=[checkpoint_callback,lr_monitor], default_root_dir=os.getcwd()+'/'+'logs/HSDT')
 trainer.fit(model, train_dataloaders=loader1, val_dataloaders=val_loader, )
 trainer.test(model, dataloaders=test_loader, ckpt_path='best', )

@@ -97,7 +97,7 @@ class ICVLDataset(Dataset):
     
 def get_gaussian_icvl_loader_s1(use_conv2d=False, crop_size=(64,64), batch_size=16, shuffle=True, num_workers=8, pin_memory=False):
     data_dir = '/HDD/Datasets/HSI_denoising/ICVL/Origin/train'
-    input_transform = noises.AddGaussanNoiseStd(50)
+    input_transform = noises.AddGaussanNoiseStd(30)
     dataset = ICVLDataset(datadir=data_dir, crop_size=crop_size, input_transform=input_transform, use2d=use_conv2d)
     loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers, pin_memory=pin_memory, worker_init_fn=worker_init_fn)
     return loader
