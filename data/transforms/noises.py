@@ -69,6 +69,7 @@ class AddGaussanNoiseStd(object):
     def __init__(self, sigma):
         self.sigma_ratio = sigma / 255.
     def __call__(self, img):
+        print(self.sigma_ratio)
         noise = torch.randn_like(img) * self.sigma_ratio
         return img + noise
     
