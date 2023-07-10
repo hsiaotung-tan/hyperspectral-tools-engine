@@ -5,9 +5,9 @@ import torch
 
 seed_everything(2000)
 
-x = torch.randn((2, 4))
-print(x)
-print(torch.argmax(x,dim=1))
+t = (1, 2, 3)
+
+print((6,6, *t))
 
 
 

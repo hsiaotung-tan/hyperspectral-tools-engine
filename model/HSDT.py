@@ -7,9 +7,9 @@ from torch.optim.lr_scheduler import MultiStepLR
 from torchmetrics.functional import peak_signal_noise_ratio, structural_similarity_index_measure, spectral_angle_mapper
 
 class HSDT(pl.LightningModule):
-    def __init__(self, in_channels:int, channels:int, num_half_layer:int, sample_idx:list, Fusion=None):
+    def __init__(self, in_channels:int, channels:int, num_half_layer:int, sample_idx:list, seed:int, train_crop_size:tuple, test_val_crop_size:tuple, batch_size:int, Fusion=None):
         super().__init__()
-        self.example_input_array=torch.Tensor(1, 1, 31, 64, 64)
+        self.example_input_array=torch.Tensor(1, 1, 31, *(train_crop_size))
         self.save_hyperparameters()
 
         # self.automatic_optimization = False
@@ -79,9 +79,9 @@ class HSDT(pl.LightningModule):
     def configure_optimizers(self):
         
         optimizer = optim.Adam(self.parameters(), lr=1e-3)
-        # multiStepLr = MultiStepLR(optimizer=optimizer, milestones=[30, 45, 55, 60, 65, 75, 80], gamma=0.5)
-        # warmupScheduler = GradualWarmupScheduler(optimizer=optimizer, multiplier=1.0, total_epoch=10,after_scheduler=multiStepLr)
-        return optimizer
+        multiStepLr = MultiStepLR(optimizer=optimizer, milestones=[30, 45, 55, 60, 65, 75, 80], gamma=0.5)
+        # warmupScheduler = GradualWarmupScheduler(optimizer=optimizer, multiplier=1.0, total_epoch=2,after_scheduler=multiStepLr)
+        return [optimizer], [multiStepLr]
     
 
 if __name__ == '__main__':
