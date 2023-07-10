@@ -50,7 +50,8 @@ class ICVLDataset(Dataset):
         target_transform=None,
         common_transforms=None,
         use2d=True,
-        repeat=1
+        repeat=1,
+        train=False
     ):
         super(ICVLDataset, self).__init__()
         datadir = Path(datadir)
@@ -60,16 +61,18 @@ class ICVLDataset(Dataset):
         self.target_transform = target_transform
         self.common_transforms = common_transforms
         self.repeat = repeat
-        self.length = len(self.files) * self.repeat
+        self.length = len(self.files) 
         self.use2d=use2d
+        self.train = train
 
     def __len__(self):
-        return self.length
+        return self.length * self.repeat
 
     def __getitem__(self, idx):
-        
+        idx = idx % self.length
         # crop HSI to designated size
-        img = self.base_transforms(torch.tensor(np.load(self.files[idx]), dtype=torch.float32))
+        data = torch.tensor(np.load(self.files[idx]), dtype=torch.float32)
+        img = self.base_transforms(data)
         
         img = utils.minmax_normalize(img)
         if not self.use2d:
@@ -95,9 +98,11 @@ class ICVLDataset(Dataset):
 
         return img, target
     
+
+
 def get_gaussian_icvl_loader_s1(use_conv2d=False, crop_size=(64,64), batch_size=16, shuffle=True, num_workers=8, pin_memory=False):
     data_dir = '/HDD/Datasets/HSI_denoising/ICVL/Origin/train'
-    input_transform = noises.AddGaussanNoiseStd(30)
+    input_transform = transforms.Compose([noises.AddGaussanNoiseStd(30)])
     dataset = ICVLDataset(datadir=data_dir, crop_size=crop_size, input_transform=input_transform, use2d=use_conv2d)
     loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers, pin_memory=pin_memory, worker_init_fn=worker_init_fn)
     return loader

@@ -36,7 +36,7 @@ def hsdt_32():
     net.bandwise = False
     return net
 
-
+# version : L 
 def hsdt_deep():
     net = HSDT(1, 16, 7, [1, 3, 5])
     net.use_2dconv = False

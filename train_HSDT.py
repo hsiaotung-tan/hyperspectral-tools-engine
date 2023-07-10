@@ -2,6 +2,7 @@ import torchvision.transforms as transforms
 from torch import nn, optim, utils
 from typing import Any
 import torch
+import numpy as np
 
 import os
 import lightning.pytorch as pl
@@ -24,8 +25,8 @@ test_loader = get_gaussian_icvl_loader_test(num_workers=0, crop_size=test_val_cr
 config_dict = {
     'in_channels':1,
     'channels':16, 
-    'num_half_layer':5, 
-    'sample_idx':[1, 3],
+    'num_half_layer':7, 
+    'sample_idx':[1, 3, 5],
     'seed':seed, 
     'train_crop_size':train_crop_size, 
     'test_val_crop_size':test_val_crop_size, 
@@ -46,6 +47,18 @@ class SwitchDatasetCallback(pl.Callback):
 
 switchDatasetCallback = SwitchDatasetCallback()
 
+
+
+class SeedCallback(pl.Callback):
+    def on_train_epoch_end(self, trainer, pl_module):
+        # do something with all training_step outputs, for example:
+        seed = torch.randint(0, 10000, (1,))
+        torch.manual_seed(seed)
+        np.random.seed(seed)
+
+seedCallback = SeedCallback()
+
+
 # saves top-K checkpoints based on "val_psnr" metric
 # checkpoint_callback = ModelCheckpoint(
 #     save_top_k=2,
@@ -56,7 +69,9 @@ switchDatasetCallback = SwitchDatasetCallback()
 lr_monitor = LearningRateMonitor(logging_interval='epoch')
 
 # accumulate_grad_batches=4
-trainer = pl.Trainer(max_epochs=80, devices=1, log_every_n_steps=1, callbacks=[lr_monitor,switchDatasetCallback], default_root_dir=os.getcwd()+'/'+'logs/HSDT')
+trainer = pl.Trainer(max_epochs=80, devices=1, log_every_n_steps=1, callbacks=[lr_monitor,switchDatasetCallback, seedCallback], default_root_dir=os.getcwd()+'/'+'logs/HSDT')
+# trainer = pl.Trainer(max_epochs=80, devices=1, log_every_n_steps=1, callbacks=[lr_monitor, seedCallback], default_root_dir=os.getcwd()+'/'+'logs/HSDT')
+
 # trainer = pl.Trainer(max_epochs=80, devices=1, log_every_n_steps=1, callbacks=[checkpoint_callback,lr_monitor], default_root_dir=os.getcwd()+'/'+'logs/HSDT')
 trainer.fit(model, train_dataloaders=loader1, val_dataloaders=val_loader, )
 trainer.test(model, dataloaders=test_loader,)

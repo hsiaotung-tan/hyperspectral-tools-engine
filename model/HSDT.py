@@ -80,9 +80,9 @@ class HSDT(pl.LightningModule):
         
         optimizer = optim.Adam(self.parameters(), lr=1e-3)
         multiStepLr = MultiStepLR(optimizer=optimizer, milestones=[30, 45, 55, 60, 65, 75, 80], gamma=0.5)
-        # warmupScheduler = GradualWarmupScheduler(optimizer=optimizer, multiplier=1.0, total_epoch=2,after_scheduler=multiStepLr)
-        return [optimizer], [multiStepLr]
-    
+        warmupScheduler = GradualWarmupScheduler(optimizer=optimizer, multiplier=1.0, total_epoch=2,after_scheduler=multiStepLr)
+        return [optimizer], [warmupScheduler]
+        # return optimizer
 
 if __name__ == '__main__':
     x = torch.randn((1,1, 64, 64))
