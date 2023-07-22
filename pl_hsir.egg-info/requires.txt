@@ -1,0 +1,7 @@
+tensorboard
+torch
+torchvision
+numpy
+lightning
+timm
+einops

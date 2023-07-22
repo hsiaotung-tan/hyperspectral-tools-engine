@@ -1,0 +1,9 @@
+Metadata-Version: 2.1
+Name: pl-hsir
+Version: 0.0.1
+Summary: Hyperspectral Image Restoration Tools
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# hyperspectral-tools-engine
+My own HSI data processing tools
