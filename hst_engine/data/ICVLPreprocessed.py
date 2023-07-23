@@ -130,12 +130,12 @@ if __name__ == '__main__':
     d = get_test_dataset()
     print(len(d))
     # print(d[12][1].max())
-    stop = 30
-    for i in d:
-        if not stop:
-            break
-        print(i[1].max())
-        stop-=1
+    # stop = 30
+    # for i in d:
+    #     if not stop:
+    #         break
+    #     print(i[1].max())
+    #     stop-=1
     # print(len(d[0][0]))
     # print(d[0][0].shape)
     # d = get_val_loader(use_2d=True)
