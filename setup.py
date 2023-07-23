@@ -17,5 +17,5 @@ setup(
     package_dir={'hst_engine': 'hst_engine', 'scripts': 'scripts'},
     version='0.0.1',
     include_package_data=True,
-    install_requires=['tensorboard', 'torch', 'torchvision', 'numpy', 'lightning', 'timm', 'einops'],
+    install_requires=['tensorboard', 'torch', 'torchvision', 'numpy', 'lightning', 'timm', 'einops', 'scipy'],
 )

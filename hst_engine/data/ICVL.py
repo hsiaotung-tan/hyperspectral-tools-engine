@@ -11,7 +11,6 @@ import torchvision.transforms as T
 
 
 
-
 class ICVLDataset(Dataset):
     def __init__(self, 
                  data_dir:str, 
