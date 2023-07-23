@@ -3,3 +3,4 @@ __pycache__/
 logs/
 pretrained/
 test/
+pl_hsir.egg-info/
