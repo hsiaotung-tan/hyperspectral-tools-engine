@@ -127,8 +127,15 @@ def get_test_loader(data_dir='/HDD/Datasets/HSI_All/Dataset/Denoise/ICVL_Test/ic
 
 if __name__ == '__main__':
     print('======================================')
-    d = get_val_dataset()
+    d = get_train_dataset()
     print(len(d))
+    # print(d[12][1].max())
+    stop = 100
+    for i in d:
+        if not stop:
+            break
+        print(i[0].max())
+        stop-=1
     # print(len(d[0][0]))
     # print(d[0][0].shape)
     # d = get_val_loader(use_2d=True)
